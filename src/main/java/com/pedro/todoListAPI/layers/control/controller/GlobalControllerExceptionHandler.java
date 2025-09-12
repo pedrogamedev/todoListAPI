@@ -1,6 +1,7 @@
 package com.pedro.todoListAPI.layers.control.controller;
 
 import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
+import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.TodoItemNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -86,6 +87,18 @@ public class GlobalControllerExceptionHandler {
                 exception.getMessage()
         );
         detail.setTitle("Empty DB.");
+        detail.setType(URI.create("none"));
+        return detail;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(PageNotFoundException.class)
+    public ProblemDetail handlePageNotFoundException(PageNotFoundException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage()
+        );
+        detail.setTitle("Page not found.");
         detail.setType(URI.create("none"));
         return detail;
     }

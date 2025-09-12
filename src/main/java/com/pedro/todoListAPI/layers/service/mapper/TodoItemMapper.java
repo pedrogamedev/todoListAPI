@@ -3,6 +3,7 @@ package com.pedro.todoListAPI.layers.service.mapper;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemRequest;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemResponse;
 import com.pedro.todoListAPI.layers.domain.model.TodoItem;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,5 +34,9 @@ public class TodoItemMapper {
         }
 
         return listResult;
+    }
+
+    public Page<TodoItemResponse> toTodoItemResponsePage(Page<TodoItem> page){
+        return page.map(item -> new TodoItemResponse(item.getId(), item.getTitle(), item.getDescription()));
     }
 }

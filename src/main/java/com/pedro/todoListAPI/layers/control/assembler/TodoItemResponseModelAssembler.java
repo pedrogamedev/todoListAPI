@@ -2,8 +2,10 @@ package com.pedro.todoListAPI.layers.control.assembler;
 
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemResponse;
 import com.pedro.todoListAPI.layers.domain.model.TodoItem;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 

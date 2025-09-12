@@ -6,10 +6,13 @@ import com.pedro.todoListAPI.layers.domain.model.TodoItem;
 import com.pedro.todoListAPI.layers.repository.TodoListRepository;
 import com.pedro.todoListAPI.layers.service.mapper.TodoItemMapper;
 import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
+import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.TodoItemNotFoundException;
 import com.pedro.todoListAPI.miscelaneous.utils.NullUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +44,19 @@ public class TodoListService {
             throw new EmptyDatabaseException();
         }
         return responses;
+    }
+    
+    public Page<TodoItemResponse> getAllTodoItemsPaged(Pageable pageable) {
+        Page<TodoItem> page = repository.findAll(pageable);
+        System.out.print(pageable.getPageNumber());
+        if (pageable.getPageNumber() > page.getTotalPages() -1)
+        {
+            throw new PageNotFoundException(pageable.getPageNumber());
+        }
+        if (page.isEmpty()){
+            throw new EmptyDatabaseException();
+        }
+        return mapper.toTodoItemResponsePage(page);
     }
 
 
