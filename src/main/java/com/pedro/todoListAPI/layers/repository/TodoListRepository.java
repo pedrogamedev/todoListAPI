@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TodoListRepository extends JpaRepository<TodoItem, Long> {
 
@@ -16,5 +18,11 @@ public interface TodoListRepository extends JpaRepository<TodoItem, Long> {
     @Transactional
     @Query("DELETE FROM todoList b WHERE b.id = :id")
     int deleteByIdCustom(@Param("id") Long id);
+
+
+    @Query("SELECT t from todoList t WHERE "+
+        "LOWER(t.title) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+        "LOWER(t.description) LIKE LOWER(CONCAT('%', :term, '%'))")
+    List<TodoItem> findByTerm(@Param("term") String term);
 
 }

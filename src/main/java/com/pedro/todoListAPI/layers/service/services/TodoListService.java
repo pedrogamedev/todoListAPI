@@ -7,6 +7,7 @@ import com.pedro.todoListAPI.layers.repository.TodoListRepository;
 import com.pedro.todoListAPI.layers.service.mapper.TodoItemMapper;
 import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
+import com.pedro.todoListAPI.miscelaneous.exceptions.TermNotFoundException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.TodoItemNotFoundException;
 import com.pedro.todoListAPI.miscelaneous.utils.NullUtils;
 import jakarta.transaction.Transactional;
@@ -36,6 +37,15 @@ public class TodoListService {
                 .orElseThrow(() -> new TodoItemNotFoundException(id));
 
         return mapper.toTodoItemResponse(todoItem);
+    }
+
+    public List<TodoItemResponse> getAllTodoItemsByTerm(String term){
+        List<TodoItemResponse> responses = mapper.toTodoItemResponseList(repository.findByTerm(term));
+        if(responses.isEmpty())
+        {
+            throw new TermNotFoundException(term);
+        }
+                return responses;
     }
 
     public List<TodoItemResponse> getAllTodoItems(){
