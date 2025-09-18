@@ -11,3 +11,20 @@ public class TodoListApiApplication {
 	}
 
 }
+/*
+todo
+-security-
+user registration
+login
+authentication
+token mechatnism for authentication
+error handling for security
+
+-nonsecurity-
+filtering
+change parameters in pagination
+unit tests
+rate limiting
+throttling
+
+ */
