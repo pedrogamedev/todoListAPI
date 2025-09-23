@@ -14,9 +14,6 @@ public class TodoListApiApplication {
 /*
 todo
 -security-
-user registration
-login
-authentication
 token mechatnism for authentication
 error handling for security
 

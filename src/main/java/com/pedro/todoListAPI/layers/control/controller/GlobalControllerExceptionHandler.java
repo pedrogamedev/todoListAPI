@@ -129,18 +129,6 @@ public class GlobalControllerExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidTokenException.class)
-    public ProblemDetail handleInvalidTokenException(InvalidTokenException exception){
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage()
-        );
-        detail.setTitle("Invalid token.");
-        detail.setDetail("about:blank");
-        return detail;
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ProblemDetail handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception){
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(
