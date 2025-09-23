@@ -6,6 +6,7 @@ import com.pedro.todoListAPI.layers.domain.dto.AuthenticationDTO;
 import com.pedro.todoListAPI.layers.domain.model.User;
 import com.pedro.todoListAPI.layers.infra.security.TokenService;
 import com.pedro.todoListAPI.layers.repository.UserRepository;
+import com.pedro.todoListAPI.layers.service.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,32 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthenticationService service;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseDTO(token));
-
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+        return ResponseEntity.ok(service.authenticateUser(data));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
-        if(this.userRepository.findByLogin(data.login()) !=null) return ResponseEntity.badRequest().build();
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data.login(), encryptedPassword, data.nickname());
-
-        this.userRepository.save(newUser);
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data){
+        service.registerUser(data);
         return ResponseEntity.ok().build();
     }
 }

@@ -1,14 +1,12 @@
 package com.pedro.todoListAPI.layers.control.controller;
 
-import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
-import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
-import com.pedro.todoListAPI.miscelaneous.exceptions.TermNotFoundException;
-import com.pedro.todoListAPI.miscelaneous.exceptions.TodoItemNotFoundException;
+import com.pedro.todoListAPI.miscelaneous.exceptions.*;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -130,4 +128,40 @@ public class GlobalControllerExceptionHandler {
         return detail;
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidTokenException.class)
+    public ProblemDetail handleInvalidTokenException(InvalidTokenException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Invalid token.");
+        detail.setDetail("about:blank");
+        return detail;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ProblemDetail handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Login not found.");
+        detail.setDetail("about:blank");
+        return detail;
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(LoginAlreadyInUseException.class)
+    public ProblemDetail handleLoginAlreadyInUseException(LoginAlreadyInUseException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Invalid login.");
+        detail.setDetail("about:blank");
+        return detail;
+    }
 }

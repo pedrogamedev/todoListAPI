@@ -1,6 +1,7 @@
 package com.pedro.todoListAPI.layers.infra.security;
 
 import com.pedro.todoListAPI.layers.repository.UserRepository;
+import com.pedro.todoListAPI.miscelaneous.exceptions.InvalidTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,6 +34,10 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token!=null){
             var login = tokenService.validateToken(token);
             UserDetails user = userRepository.findByLogin(login);
+            if(user == null)
+            {
+                throw new InvalidTokenException();
+            }
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
