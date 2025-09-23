@@ -16,7 +16,6 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-
     @Autowired
     TokenService tokenService;
 
@@ -24,38 +23,49 @@ public class SecurityFilter extends OncePerRequestFilter {
     UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         var token = this.recoverToken(request);
 
-        try {
-            if (token != null) {
-                var login = tokenService.validateToken(token); // Might throw if invalid
-                var user = userRepository.findByLogin(login);
+        if (token == null) {
+            unauthorizedResponse(response, "Token is missing");
+            return;
+        }
 
-                if (user != null) {
-                    var authentication = new UsernamePasswordAuthenticationToken(
-                            user, null, user.getAuthorities()
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found");
-                    return;
-                }
+        try {
+            var login = tokenService.validateToken(token); // May throw
+            var user = userRepository.findByLogin(login);
+
+            if (user == null) {
+                unauthorizedResponse(response, "User not found");
+                return;
             }
 
-            // Continue the filter chain
+            var authentication = new UsernamePasswordAuthenticationToken(
+                    user, null, user.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             filterChain.doFilter(request, response);
 
         } catch (Exception ex) {
-            // Token is invalid or validation failed
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+            unauthorizedResponse(response, "Unauthorized");
         }
     }
 
+    private void unauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"" + message + "\"}");
+        response.flushBuffer();
+    }
+
+
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-
-        if(authHeader == null) return null;
-        return authHeader.replace("Bearer ", "");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+        return authHeader.replace("Bearer ", "").trim();
     }
 }
