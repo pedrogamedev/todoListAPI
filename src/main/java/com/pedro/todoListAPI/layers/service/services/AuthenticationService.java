@@ -4,7 +4,7 @@ import com.pedro.todoListAPI.layers.domain.dto.AuthenticationDTO;
 import com.pedro.todoListAPI.layers.domain.dto.LoginResponseDTO;
 import com.pedro.todoListAPI.layers.domain.dto.RegisterDTO;
 import com.pedro.todoListAPI.layers.domain.model.User;
-import com.pedro.todoListAPI.layers.infra.security.TokenService;
+import com.pedro.todoListAPI.layers.infra.security.AuthTokenService;
 import com.pedro.todoListAPI.layers.repository.UserRepository;
 import com.pedro.todoListAPI.miscelaneous.exceptions.LoginAlreadyInUseException;
 import jakarta.validation.Valid;
@@ -25,14 +25,14 @@ public class AuthenticationService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private TokenService tokenService;
+    private AuthTokenService authTokenService;
 
     public LoginResponseDTO authenticateUser(@RequestBody @Valid AuthenticationDTO data){
 
         var user = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(user);
 
-        return new LoginResponseDTO(tokenService.generateToken((User) auth.getPrincipal()));
+        return new LoginResponseDTO(authTokenService.generateToken((User) auth.getPrincipal()));
     }
 
     public void registerUser(@RequestBody @Valid RegisterDTO data)
