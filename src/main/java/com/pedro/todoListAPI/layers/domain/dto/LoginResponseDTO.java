@@ -1,4 +1,10 @@
 package com.pedro.todoListAPI.layers.domain.dto;
 
-public record LoginResponseDTO(String token) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record LoginResponseDTO(
+
+        String authToken,
+        String refreshToken) {
 }

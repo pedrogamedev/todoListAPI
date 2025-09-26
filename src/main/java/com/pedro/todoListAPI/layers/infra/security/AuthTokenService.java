@@ -18,15 +18,17 @@ public class AuthTokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+
+    //generate in login
     public String generateToken(User user){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                     .withIssuer("auth-api")
+                    .withClaim("token_type", "auth")
                     .withSubject(user.getLogin())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
-            return token;
         }
         catch (JWTCreationException exception){
             throw new RuntimeException("Error while generating token.", exception);
@@ -34,13 +36,30 @@ public class AuthTokenService {
         }
     }
 
+    //generate in refresh
+    public String generateToken(String subject) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("auth-api")
+                    .withClaim("token_type", "auth")
+                    .withSubject(subject)
+                    .withExpiresAt(genExpirationDate())
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Error while generating token.", exception);
 
-    public String validateToken(String token){
+        }
+    }
+
+
+        public String validateToken(String token, String subject){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
                     .withIssuer("auth-api")
+                    .withSubject(subject)
                     .build()
                     .verify(token)
                     .getSubject();

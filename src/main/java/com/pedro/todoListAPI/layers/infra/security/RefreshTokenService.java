@@ -23,12 +23,12 @@ public class RefreshTokenService {
     public String generateToken(User user){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                     .withIssuer("auth-api")
+                    .withClaim("token_type", "refresh")
                     .withSubject(user.getLogin())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
-            return token;
         }
         catch (JWTCreationException exception){
             throw new RuntimeException("Error while generating token.", exception);
@@ -36,12 +36,13 @@ public class RefreshTokenService {
         }
     }
 
-    public String validateToken(String token){
+    public String validateToken(String token, String subject){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
                     .withIssuer("auth-api")
+                    .withSubject(subject)
                     .build()
                     .verify(token)
                     .getSubject();

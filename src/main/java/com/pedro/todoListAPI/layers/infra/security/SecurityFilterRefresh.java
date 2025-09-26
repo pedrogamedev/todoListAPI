@@ -1,5 +1,6 @@
 package com.pedro.todoListAPI.layers.infra.security;
 
+import com.auth0.jwt.JWT;
 import com.pedro.todoListAPI.layers.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,12 +16,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 public class SecurityFilterRefresh extends OncePerRequestFilter {
 
     @Autowired
-    AuthTokenService authTokenService;
+    RefreshTokenService refreshTokenService;
 
     @Autowired
     UserRepository userRepository;
@@ -29,22 +31,22 @@ public class SecurityFilterRefresh extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = this.recoverToken(request);
-
-        //checking if it`s not login/register related, if not, checks if token/user is null or blank, if it is, throws error
-        if(!request.getServletPath().startsWith("/auth/login") && !request.getServletPath().startsWith("/auth/register"))
+        if(request.getServletPath().startsWith("/auth/refresh"))
         {
-            if (token == null) unauthorizedResponse(response,"invalid token bearer.");
-            else{
+            String token = this.recoverToken(request);
 
-                String login = authTokenService.validateToken(token);
+            if (token == null) unauthorizedResponse(response,"invalid token bearer.");
+            else if(JWT.decode(token).getClaim("token_type").asString().equals("auth")){
+                unauthorizedResponse(response, "invalid token type");
+            }
+            else{
+                String login = refreshTokenService.validateToken(token, JWT.decode(token).getSubject());
                 UserDetails user = userRepository.findByLogin(login);
 
-                if (user == null) unauthorizedResponse(response,"user not found.");
+                if (user == null) unauthorizedResponse(response,"inexistent or expired refresh token.");
 
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
             }
         }
         filterChain.doFilter(request, response);

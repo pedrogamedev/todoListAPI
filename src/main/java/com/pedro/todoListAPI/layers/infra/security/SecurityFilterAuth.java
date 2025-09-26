@@ -1,5 +1,6 @@
 package com.pedro.todoListAPI.layers.infra.security;
 
+import com.auth0.jwt.JWT;
 import com.pedro.todoListAPI.layers.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
@@ -29,21 +30,25 @@ public class SecurityFilterAuth extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = this.recoverToken(request);
-
         //checking if it`s not login/register related, if not, checks if token/user is null or blank, if it is, throws error
-        if(!request.getServletPath().startsWith("/auth/login") && !request.getServletPath().startsWith("/auth/register"))
+        if(!request.getServletPath().startsWith("/auth/refresh") && !request.getServletPath().startsWith("/auth/login") && !request.getServletPath().startsWith("/auth/register"))
         {
-            if (token == null) unauthorizedResponse(response,"invalid token bearer.");
-            else{
 
-                String login = authTokenService.validateToken(token);
+            String token = this.recoverToken(request);
+
+
+            if (token == null) unauthorizedResponse(response,"invalid token bearer.");
+            else if(JWT.decode(token).getClaim("token_type").asString().equals("refresh"))
+                unauthorizedResponse(response, "invalid token type");
+            else{
+                String login = authTokenService.validateToken(token, JWT.decode(token).getSubject());
                 UserDetails user = userRepository.findByLogin(login);
 
                 if (user == null) unauthorizedResponse(response,"inexistent or expired token.");
-
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                else{
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 
             }
         }

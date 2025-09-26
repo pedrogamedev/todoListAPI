@@ -23,6 +23,9 @@ public class SecurityConfigurations {
     @Autowired
     SecurityFilterAuth securityFilterAuth;
 
+    @Autowired
+    SecurityFilterRefresh securityFilterRefresh;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -41,6 +44,7 @@ public class SecurityConfigurations {
                         })
                 )
                 .addFilterBefore(securityFilterAuth, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(securityFilterRefresh, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

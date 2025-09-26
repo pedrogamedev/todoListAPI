@@ -3,12 +3,7 @@ package com.pedro.todoListAPI.layers.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AuthenticationDTO(
-
-        @NotNull @NotBlank
-        String login,
-
-        @NotNull @NotBlank
-        String password
+public record RefreshRequestDTO(
+        @NotNull @NotBlank String refreshToken
 ) {
 }
