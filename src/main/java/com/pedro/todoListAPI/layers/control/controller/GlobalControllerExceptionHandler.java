@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +27,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Blogpost not found.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -38,6 +40,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -49,6 +52,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -61,6 +65,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -75,6 +80,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -87,6 +93,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Empty DB.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -99,6 +106,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Page not found.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -111,6 +119,7 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("No result found.");
         detail.setDetail("about:blank");
         return detail;
@@ -123,6 +132,8 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
+
+        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid parameter.");
         detail.setDetail("about:blank");
         return detail;
@@ -135,7 +146,21 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setTitle("Login not found.");
+        detail.setProperty("information", exception.getMessage());
+        detail.setTitle("Bad login.");
+        detail.setDetail("about:blank");
+        return detail;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ProblemDetail handleBadCredentialsException(BadCredentialsException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setProperty("information", exception.getMessage());
+        detail.setTitle("Bad login.");
         detail.setDetail("about:blank");
         return detail;
     }
@@ -148,7 +173,8 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setTitle("Invalid login.");
+        detail.setProperty("information", exception.getMessage());
+        detail.setTitle("Invalid credentials.");
         detail.setDetail("about:blank");
         return detail;
     }

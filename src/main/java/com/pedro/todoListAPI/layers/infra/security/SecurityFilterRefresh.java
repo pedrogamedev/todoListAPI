@@ -1,7 +1,9 @@
 package com.pedro.todoListAPI.layers.infra.security;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.pedro.todoListAPI.layers.repository.UserRepository;
+import com.pedro.todoListAPI.miscelaneous.utils.Base64DecoderUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,18 +37,26 @@ public class SecurityFilterRefresh extends OncePerRequestFilter {
         {
             String token = this.recoverToken(request);
 
-            if (token == null) unauthorizedResponse(response,"invalid token bearer.");
-            else if(JWT.decode(token).getClaim("token_type").asString().equals("auth")){
-                unauthorizedResponse(response, "invalid token type");
-            }
+            if (token == null) unauthorizedResponse(response,"Invalid token bearer.");
             else{
+                try{
+                    if(JWT.decode(token).getClaim("token_type").asString().equals("auth")){
+                        unauthorizedResponse(response, "Invalid token type.");
+                    }
+                }
+                catch (JWTDecodeException exception){
+                    unauthorizedResponse(response, "Invalid token syntax.");
+                }
+
                 String login = refreshTokenService.validateToken(token, JWT.decode(token).getSubject());
                 UserDetails user = userRepository.findByLogin(login);
 
-                if (user == null) unauthorizedResponse(response,"inexistent or expired refresh token.");
+                if (user == null) unauthorizedResponse(response,"Inexistent or expired refresh token.");
+                else{
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
         filterChain.doFilter(request, response);

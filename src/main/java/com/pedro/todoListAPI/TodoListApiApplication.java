@@ -13,10 +13,6 @@ public class TodoListApiApplication {
 }
 /*
 todo
--security-
-token mechatnism for authentication
-error handling for security
-
 -nonsecurity-
 filtering
 change parameters in pagination

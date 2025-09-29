@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,10 +37,12 @@ public class AuthenticationService {
     public LoginResponseDTO authenticateUser(@RequestBody @Valid AuthenticationDTO data){
 
         var user = new UsernamePasswordAuthenticationToken(data.login(), data.password());
-        var auth = this.authenticationManager.authenticate(user);
 
-        return new LoginResponseDTO(authTokenService.generateToken((User) auth.getPrincipal()),
-                refreshTokenService.generateToken((User) auth.getPrincipal()));
+            var auth = this.authenticationManager.authenticate(user);
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA          ->" + auth);
+            return new LoginResponseDTO(authTokenService.generateToken((User) auth.getPrincipal()),
+                    refreshTokenService.generateToken((User) auth.getPrincipal()));
+
     }
 
     public void registerUser(@RequestBody @Valid RegisterDTO data)
