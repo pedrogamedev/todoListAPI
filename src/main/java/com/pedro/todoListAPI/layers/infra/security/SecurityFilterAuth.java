@@ -40,7 +40,7 @@ public class SecurityFilterAuth extends OncePerRequestFilter {
             if (token == null) unauthorizedResponse(response,"Invalid token bearer.");
             else{
                 try{
-                    if(JWT.decode(token).getClaim("token_type").asString().equals("auth")){
+                    if(JWT.decode(token).getClaim("token_type").asString().equals("refresh")){
                         unauthorizedResponse(response, "Invalid token type.");
                     }
                 }

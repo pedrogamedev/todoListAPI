@@ -2,19 +2,18 @@ package com.pedro.todoListAPI.layers.control.controller;
 
 
 import com.pedro.todoListAPI.layers.control.assembler.TodoItemResponseModelAssembler;
+import com.pedro.todoListAPI.layers.domain.dto.PageableRequestDTO;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemRequest;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemResponse;
-import com.pedro.todoListAPI.layers.domain.model.TodoItem;
 import com.pedro.todoListAPI.layers.service.services.TodoListService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import org.hibernate.query.SortDirection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -62,10 +61,12 @@ public class TodoListController {
 
     @GetMapping("/todoList/getPaged")
     public ResponseEntity<PagedModel<EntityModel<TodoItemResponse>>> getAllTodoItems(
-            @PageableDefault(size = 1, sort = "title", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @RequestParam(defaultValue = "1", required = true) @Pattern(regexp = "^(0|[1-9][0-9]*)$") String page,
+            @RequestParam(defaultValue = "1", required = false) @Pattern(regexp = "^(0|[1-9][0-9]*)$") String size,
+            @RequestParam(required = false) Sort sort
+            ) {
         PagedModel<EntityModel<TodoItemResponse>> response = assemblerPaged.toModel(
-                service.getAllTodoItemsPaged(pageable), assembler
+                service.getAllTodoItemsPaged(new PageableRequestDTO(page,size,sort)), assembler
         );
         return ResponseEntity.ok(response);
     }

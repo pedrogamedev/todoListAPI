@@ -1,9 +1,11 @@
 package com.pedro.todoListAPI.layers.service.services;
 
+import com.pedro.todoListAPI.layers.domain.dto.PageableRequestDTO;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemRequest;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemResponse;
 import com.pedro.todoListAPI.layers.domain.model.TodoItem;
 import com.pedro.todoListAPI.layers.repository.TodoListRepository;
+import com.pedro.todoListAPI.layers.service.mapper.PageableMapper;
 import com.pedro.todoListAPI.layers.service.mapper.TodoItemMapper;
 import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
@@ -25,22 +27,25 @@ public class TodoListService {
     TodoListRepository repository;
 
     @Autowired
-    TodoItemMapper mapper;
+    TodoItemMapper todoItemMapper;
+
+    @Autowired
+    PageableMapper pageableMapper;
 
     @Transactional
     public TodoItemResponse saveTodoItem(TodoItemRequest request){
-        return mapper.toTodoItemResponse(repository.save(mapper.toTodoItem(request)));
+        return todoItemMapper.toTodoItemResponse(repository.save(todoItemMapper.toTodoItem(request)));
     }
 
     public TodoItemResponse getTodoItemById(Long id){
         TodoItem todoItem = repository.findById(id)
                 .orElseThrow(() -> new TodoItemNotFoundException(id));
 
-        return mapper.toTodoItemResponse(todoItem);
+        return todoItemMapper.toTodoItemResponse(todoItem);
     }
 
     public List<TodoItemResponse> getAllTodoItemsByTerm(String term){
-        List<TodoItemResponse> responses = mapper.toTodoItemResponseList(repository.findByTerm(term));
+        List<TodoItemResponse> responses = todoItemMapper.toTodoItemResponseList(repository.findByTerm(term));
         if(responses.isEmpty())
         {
             throw new TermNotFoundException(term);
@@ -49,16 +54,19 @@ public class TodoListService {
     }
 
     public List<TodoItemResponse> getAllTodoItems(){
-        List<TodoItemResponse> responses = mapper.toTodoItemResponseList(repository.findAll());
+        List<TodoItemResponse> responses = todoItemMapper.toTodoItemResponseList(repository.findAll());
         if(responses.isEmpty()){
             throw new EmptyDatabaseException();
         }
         return responses;
     }
     
-    public Page<TodoItemResponse> getAllTodoItemsPaged(Pageable pageable) {
+    public Page<TodoItemResponse> getAllTodoItemsPaged(PageableRequestDTO dto) {
+
+
+        Pageable pageable =pageableMapper.toPageable(dto);
+
         Page<TodoItem> page = repository.findAll(pageable);
-        System.out.print(pageable.getPageNumber());
         if (pageable.getPageNumber() > page.getTotalPages() -1)
         {
             throw new PageNotFoundException(pageable.getPageNumber());
@@ -66,7 +74,7 @@ public class TodoListService {
         if (page.isEmpty()){
             throw new EmptyDatabaseException();
         }
-        return mapper.toTodoItemResponsePage(page);
+        return todoItemMapper.toTodoItemResponsePage(page);
     }
 
 
@@ -76,7 +84,7 @@ public class TodoListService {
                 .map(newTodoItem ->{
                     newTodoItem.setTitle(request.title());
                     NullUtils.updateIfPresent(newTodoItem::setDescription, request.description());
-                    return mapper.toTodoItemResponse(newTodoItem);
+                    return todoItemMapper.toTodoItemResponse(newTodoItem);
                 }).orElseThrow(() -> new TodoItemNotFoundException(id));
     }
 

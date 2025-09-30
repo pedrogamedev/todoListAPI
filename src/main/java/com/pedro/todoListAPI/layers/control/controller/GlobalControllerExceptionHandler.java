@@ -2,6 +2,7 @@ package com.pedro.todoListAPI.layers.control.controller;
 
 import com.pedro.todoListAPI.miscelaneous.exceptions.*;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,7 +28,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Blogpost not found.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -40,7 +40,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -52,7 +51,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -65,7 +63,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -80,7 +77,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid request.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -93,7 +89,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Empty DB.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -106,7 +101,6 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Page not found.");
         detail.setType(URI.create("about:blank"));
         return detail;
@@ -119,9 +113,8 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("No result found.");
-        detail.setDetail("about:blank");
+        detail.setType(URI.create("about:blank"));
         return detail;
     }
 
@@ -133,9 +126,8 @@ public class GlobalControllerExceptionHandler {
                 exception.getMessage()
         );
 
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid parameter.");
-        detail.setDetail("about:blank");
+        detail.setType(URI.create("about:blank"));
         return detail;
     }
 
@@ -146,9 +138,8 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Bad login.");
-        detail.setDetail("about:blank");
+        detail.setType(URI.create("about:blank"));
         return detail;
     }
 
@@ -159,9 +150,8 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Bad login.");
-        detail.setDetail("about:blank");
+        detail.setType(URI.create("about:blank"));
         return detail;
     }
 
@@ -173,9 +163,20 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage()
         );
-        detail.setProperty("information", exception.getMessage());
         detail.setTitle("Invalid credentials.");
-        detail.setDetail("about:blank");
+        detail.setType(URI.create("about:blank"));
+        return detail;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ProblemDetail handlePropertyReferenceExceptionHandling(PropertyReferenceException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Invalid property.");
+        detail.setType(URI.create("about:blank"));
         return detail;
     }
 }

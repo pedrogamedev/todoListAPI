@@ -13,11 +13,10 @@ public class TodoListApiApplication {
 }
 /*
 todo
--nonsecurity-
 filtering
 change parameters in pagination
-unit tests
 rate limiting
 throttling
+add hateoas links
 
  */
