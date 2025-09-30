@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.net.URI;
@@ -151,6 +152,18 @@ public class GlobalControllerExceptionHandler {
                 exception.getMessage()
         );
         detail.setTitle("Bad login.");
+        detail.setType(URI.create("about:blank"));
+        return detail;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentConversionNotSupportedException.class)
+    public ProblemDetail handleMethodArgumentConversionNotSupportedException(MethodArgumentConversionNotSupportedException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Invalid type for parameter.");
         detail.setType(URI.create("about:blank"));
         return detail;
     }

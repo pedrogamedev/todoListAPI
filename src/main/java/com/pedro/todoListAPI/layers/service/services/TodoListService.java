@@ -1,11 +1,9 @@
 package com.pedro.todoListAPI.layers.service.services;
 
-import com.pedro.todoListAPI.layers.domain.dto.PageableRequestDTO;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemRequest;
 import com.pedro.todoListAPI.layers.domain.dto.TodoItemResponse;
 import com.pedro.todoListAPI.layers.domain.model.TodoItem;
 import com.pedro.todoListAPI.layers.repository.TodoListRepository;
-import com.pedro.todoListAPI.layers.service.mapper.PageableMapper;
 import com.pedro.todoListAPI.layers.service.mapper.TodoItemMapper;
 import com.pedro.todoListAPI.miscelaneous.exceptions.EmptyDatabaseException;
 import com.pedro.todoListAPI.miscelaneous.exceptions.PageNotFoundException;
@@ -28,9 +26,6 @@ public class TodoListService {
 
     @Autowired
     TodoItemMapper todoItemMapper;
-
-    @Autowired
-    PageableMapper pageableMapper;
 
     @Transactional
     public TodoItemResponse saveTodoItem(TodoItemRequest request){
@@ -61,10 +56,9 @@ public class TodoListService {
         return responses;
     }
     
-    public Page<TodoItemResponse> getAllTodoItemsPaged(PageableRequestDTO dto) {
+    public Page<TodoItemResponse> getAllTodoItemsPaged(Pageable pageable) {
 
 
-        Pageable pageable =pageableMapper.toPageable(dto);
 
         Page<TodoItem> page = repository.findAll(pageable);
         if (pageable.getPageNumber() > page.getTotalPages() -1)
