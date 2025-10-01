@@ -13,10 +13,5 @@ public class TodoListApiApplication {
 }
 /*
 todo
-filtering
-change parameters in pagination
-rate limiting
-throttling
-add hateoas links
-
+throttling (alternate branch -use guava?)
  */

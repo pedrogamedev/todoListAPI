@@ -192,4 +192,19 @@ public class GlobalControllerExceptionHandler {
         detail.setType(URI.create("about:blank"));
         return detail;
     }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgumentException(IllegalArgumentException exception){
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage()
+        );
+        detail.setTitle("Illegal parameter value.");
+        detail.setType(URI.create("about:blank"));
+        return detail;
+    }
+
+
 }
